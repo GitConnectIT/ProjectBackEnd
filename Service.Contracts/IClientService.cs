@@ -13,4 +13,5 @@ public interface IClientService
 {
     Task<ClientListDTO> GetRecordById(int id);
     Task<PagedListResponse<IEnumerable<ClientListDTO>>> GetAllRecords(LookupRepositoryDTO filter);
+    Task<bool> SendClientEmail(SendEmailDTO sendEmailDto);
 }

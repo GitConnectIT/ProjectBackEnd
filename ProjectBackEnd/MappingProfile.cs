@@ -11,6 +11,7 @@ public class MappingProfile : Profile
     {
         //Register
         CreateMap<UserRegisterDTO, ApplicationUser>().ReverseMap();
+        CreateMap<UserListDTO, ApplicationUser>().ReverseMap();
 
         //EmailTemplate
         CreateMap<EmailTemplate, EmailTemplateDTO>().ReverseMap();

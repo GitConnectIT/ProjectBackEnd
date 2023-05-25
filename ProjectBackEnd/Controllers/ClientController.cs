@@ -14,6 +14,7 @@ namespace ProjectBackEnd.Controllers;
 [Route("api/clients")]
 [ApiController]
 [CustomAuthorize]
+[Authorize(Roles = "Admin, User")]
 public class ClientController : ControllerBase
 {
     private readonly IServiceManager _service;
@@ -40,6 +41,19 @@ public class ClientController : ControllerBase
     {
         var result = await _service.ClientService.GetAllRecords(filter);
         var baseResponse = new BaseResponse<PagedListResponse<IEnumerable<ClientListDTO>>, object>
+        {
+            Result = true,
+            Data = result,
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+    }
+    [HttpPost("send-email")]
+    public async Task<IActionResult> SendEmail([FromBody] SendEmailDTO sendEmail)
+    {
+        var result = await _service.ClientService.SendClientEmail(sendEmail);
+        var baseResponse = new BaseResponse<object, object>
         {
             Result = true,
             Data = result,

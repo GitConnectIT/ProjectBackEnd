@@ -36,7 +36,7 @@ public class ServiceManager : IServiceManager
         _applicationMenuService = new Lazy<IApplicationMenuService>(() => new ApplicationMenuService(dapperRepository, logger, repositoryManager, mapper)); 
         _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration, repositoryManager, signInManager, emailSender, cryptoUtils, defaultConfig));
         _emailTemplateService = new Lazy<IEmailTemplateService>(() => new EmailTemplateService(logger, mapper, repositoryManager, dapperRepository));
-        _clientService = new Lazy<IClientService>(() => new ClientService(logger, mapper, repositoryManager, dapperRepository));
+        _clientService = new Lazy<IClientService>(() => new ClientService(logger, mapper, repositoryManager, dapperRepository, emailSender));
 
     }
 

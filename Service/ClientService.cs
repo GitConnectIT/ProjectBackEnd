@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using EmailService;
 using Entities.Exceptions;
 using Entities.Models;
 using Repository.Contracts;
@@ -21,13 +22,16 @@ public class ClientService : IClientService
     private readonly IMapper _mapper;
     private readonly IRepositoryManager _repositoryManager;
     private readonly IDapperRepository _dapperRepository;
+    private readonly IEmailSender _emailSender;
 
-    public ClientService(ILoggerManager logger, IMapper mapper, IRepositoryManager repositoryManager, IDapperRepository dapperRepository)
+
+    public ClientService(ILoggerManager logger, IMapper mapper, IRepositoryManager repositoryManager, IDapperRepository dapperRepository, IEmailSender emailSender)
     {
         _logger = logger;
         _mapper = mapper;
         _repositoryManager = repositoryManager;
         _dapperRepository = dapperRepository;
+        _emailSender = emailSender;
     }
     public async Task<ClientListDTO> GetRecordById(int id)
     {
@@ -68,6 +72,21 @@ public class ClientService : IClientService
             _logger.LogError(string.Format("{0}: {1}", nameof(GetAllRecords), ex.Message));
             throw new BadRequestException(ex.Message);
         }
+    }
+    public async Task<bool> SendClientEmail(SendEmailDTO sendEmailDto)
+    {
+        try
+        {
+            var message = new Message(new string[] { sendEmailDto.ToEmail }, sendEmailDto.Subject, sendEmailDto.Body);
+            await _emailSender.SendEmailAsync(message);
+            return true;
+        }
+        catch(Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(SendClientEmail), ex.Message));
+            throw new BadRequestException(ex.Message);
+        }
+
     }
     #region Private Methods
 

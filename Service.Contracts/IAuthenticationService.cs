@@ -10,5 +10,6 @@ public interface IAuthenticationService
     Task<TokenDTO> RefreshToken(TokenDTO tokenDto);
     Task<TokenDTO> TwoStepVerification(TwoStepDTO twoFactorDto);
     Task<bool> ConfirmEmail(ConfirmationEmailDTO confirmationEmailDto);
+    Task<UserListDTO> GetRecordById(int userId);
 
 }

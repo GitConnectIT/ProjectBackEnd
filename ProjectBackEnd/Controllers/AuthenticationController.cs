@@ -2,6 +2,7 @@
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProjectBackEnd.Utility;
 using ProjectBackEnd.Validation;
 using Service.Contracts;
 using Shared.DTO;
@@ -125,5 +126,18 @@ public class AuthenticationController : ControllerBase
         };
         return Ok(baseResponse);
     }
-
+    [HttpGet("userById")]
+    [Authorize]
+    public async Task<IActionResult> GetLoggedUser()
+    {
+        var result = await _service.AuthenticationService.GetRecordById(ClaimsUtility.ReadCurrentUserId(User.Claims));
+        var baseResponse = new BaseResponse<UserListDTO, object>
+        {
+            Result = true,
+            Data = result,
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+    }
 }

@@ -203,6 +203,28 @@ public class AuthenticationService : IAuthenticationService
             throw new BadRequestException(ex.Message);
         }
     }
+    public async Task<UserListDTO> GetRecordById(int userId)
+    {
+        try
+        {
+            var existingUser = await GetUserAndCheckIfExistsAsync(userId);
+            var userById = _mapper.Map<UserListDTO>(existingUser);
+
+            var roles = await _userManager.GetRolesAsync(existingUser);
+
+            foreach (var role in roles)
+            {
+                userById.Role = role;
+            }
+
+            return userById;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(GetRecordById), ex.Message));
+            throw new NotFoundException(ex.Message);
+        }
+    }
     #region Private Methods
     private async Task SendEmailConfirmationLink(ApplicationUser user)
     {
@@ -355,6 +377,14 @@ public class AuthenticationService : IAuthenticationService
             var message = new Message(new string[] { userEmail }, welcomeEmailTemplate.Subject, welcomeEmailTemplate.Body);
             await _emailSender.SendEmailAsync(message);
         }
+    }
+    private async Task<ApplicationUser> GetUserAndCheckIfExistsAsync(int userId)
+    {
+        var existingUser = await _repositoryManager.UserRepository.GetRecordByIdAsync(userId);
+        if (existingUser is null)
+            throw new NotFoundException(string.Format("Përdoruesi me Id: {0} nuk u gjet!", userId));
+
+        return existingUser;
     }
     #endregion
 }
