@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using EmailService;
 using Entities.Exceptions;
 using Entities.Models;
@@ -77,8 +78,15 @@ public class ClientService : IClientService
     {
         try
         {
-            var message = new Message(new string[] { sendEmailDto.ToEmail }, sendEmailDto.Subject, sendEmailDto.Body);
-            await _emailSender.SendEmailAsync(message);
+            foreach(var clientId in sendEmailDto.ClientIds)
+            {
+                var existingClient = await _repositoryManager.ClientRepository.GetRecordByIdAsync(clientId);
+                if (existingClient is not null)
+                {
+                    var message = new Message(new string[] { existingClient.Email }, sendEmailDto.Subject, sendEmailDto.Body);
+                    await _emailSender.SendEmailAsync(message);
+                }
+            }
             return true;
         }
         catch(Exception ex)

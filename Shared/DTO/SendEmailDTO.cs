@@ -9,9 +9,8 @@ namespace Shared.DTO;
 
 public class SendEmailDTO
 {
-    public string ToEmail { get; set; }
+    public List<int> ClientIds { get; set; }
     public string Subject { get; set; }
     public string Body { get; set; }
-    //public List<IFormFile> Attachments { get; set; }
-
+    public List<IFormFile?>? Attachments { get; set; }
 }
