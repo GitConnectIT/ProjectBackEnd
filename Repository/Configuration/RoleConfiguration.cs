@@ -12,20 +12,14 @@ public class RoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
             new ApplicationRole
             {
                 Id = 1,
-                Name = "Menaxher",
-                NormalizedName = "MENAXHER"
+                Name = "Admin",
+                NormalizedName = "ADMIN"
             },
             new ApplicationRole
             {
                 Id = 2,
-                Name = "Recepsionist",
-                NormalizedName = "RECEPSIONIST"
-            },
-            new ApplicationRole
-            {
-                Id = 3,
-                Name = "Staff",
-                NormalizedName = "STAFF"
+                Name = "User",
+                NormalizedName = "USER"
             }
         );
     }

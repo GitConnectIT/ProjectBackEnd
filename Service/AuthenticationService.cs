@@ -63,13 +63,14 @@ public class AuthenticationService : IAuthenticationService
             var user = _mapper.Map<ApplicationUser>(userRegister);
             user.UserName = userRegister.Email;
             user.DateCreated = DateTime.UtcNow;
-            user.EmailConfirmed = true;
+            //user.EmailConfirmed = true;
 
             var result = await _userManager.CreateAsync(user, userRegister.Password);
 
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(user, role);
+                await SendEmailConfirmationLink(user);
                 //await _userManager.SetTwoFactorEnabledAsync(user, true);
             }
             return result;
@@ -130,6 +131,32 @@ public class AuthenticationService : IAuthenticationService
             throw new BadRequestException(ex.Message);
         }
     }
+    public async Task<bool> ConfirmEmail(ConfirmationEmailDTO confirmationEmailDto)
+    {
+        try
+        {
+            var userCheck = await _userManager.FindByEmailAsync(confirmationEmailDto.Email);
+            if (userCheck is null)
+                throw new NotFoundException(string.Format("Përdoruesi me e-mail {0} nuk u gjet!", confirmationEmailDto.Email));
+
+            var result = await _userManager.ConfirmEmailAsync(userCheck, confirmationEmailDto.Token);
+            if (!result.Succeeded)
+            {
+                throw new BadRequestException("E-mail dhe e-mail i konfirmimit nuk përputhen!");
+            }
+            userCheck.EmailConfirmed = true;
+            await _userManager.UpdateAsync(userCheck);
+
+            await SendRegistrationEmail(userCheck.Email, userCheck.FirstName, userCheck.LastName);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(ConfirmEmail), ex.Message));
+            throw new BadRequestException(ex.Message);
+        }
+    }
 
     public async Task<TokenDTO> RefreshToken(TokenDTO tokenDto)
     {
@@ -176,29 +203,23 @@ public class AuthenticationService : IAuthenticationService
             throw new BadRequestException(ex.Message);
         }
     }
-
-    private async Task SendRegistrationEmailAndSms(string userEmail, string firstName, string lastName, string phoneNumber)
+    #region Private Methods
+    private async Task SendEmailConfirmationLink(ApplicationUser user)
     {
-        var welcomeEmailTemplate = await _repositoryManager.EmailTemplateRepository.GetRecordByCodeAsync(EmailTemplateCode.Welcome);
+        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        var confirmEmailTemplate = await _repositoryManager.EmailTemplateRepository.GetRecordByCodeAsync(EmailTemplateCode.ConfirmationEmail);
 
-        if (welcomeEmailTemplate is null)
-            _logger.LogError($"Email/Sms Template me kod: {EmailTemplateCode.Welcome} nuk u gjet!");
+        if (confirmEmailTemplate is null)
+            _logger.LogError($"EmailTemplate me kod: {EmailTemplateCode.ConfirmationEmail} nuk u gjet!");
         else
         {
-            welcomeEmailTemplate.Body = welcomeEmailTemplate.Body.Replace("{fullName}", $"{firstName} {lastName}");
-            welcomeEmailTemplate.Body = welcomeEmailTemplate.Body.Replace("{url}", _defaultConfig.ApplicationUrl);
+            confirmEmailTemplate.Body = confirmEmailTemplate.Body.Replace("{fullName}", $"{user.FirstName} {user.LastName}");
+            confirmEmailTemplate.Body = confirmEmailTemplate.Body.Replace("{url}", $"{_defaultConfig.ApplicationUrl}/confirmationemail/token={token}&email={user.Email}");
 
-            var message = new Message(new string[] { userEmail }, welcomeEmailTemplate.Subject, welcomeEmailTemplate.Body);
+            var message = new Message(new string[] { user.Email }, confirmEmailTemplate.Subject, confirmEmailTemplate.Body);
             await _emailSender.SendEmailAsync(message);
-
-            //if (!string.IsNullOrWhiteSpace(phoneNumber))
-            //{
-            //    var smsMessage = new SmsMessage(phoneNumber, "Mirë se vjen në Finalb!");
-            //    await _smsSender.SendSmsAsync(_defaultConfig.UseTokyDigitalProvider, smsMessage);
-            //}
         }
     }
-
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
@@ -320,5 +341,20 @@ public class AuthenticationService : IAuthenticationService
             throw new BadRequestException(ex.Message);
         }
     }
+    private async Task SendRegistrationEmail(string userEmail, string firstName, string lastName)
+    {
+        var welcomeEmailTemplate = await _repositoryManager.EmailTemplateRepository.GetRecordByCodeAsync(EmailTemplateCode.Welcome);
 
+        if (welcomeEmailTemplate is null)
+            _logger.LogError($"Email/Sms Template me kod: {EmailTemplateCode.Welcome} nuk u gjet!");
+        else
+        {
+            welcomeEmailTemplate.Body = welcomeEmailTemplate.Body.Replace("{fullName}", $"{firstName} {lastName}");
+            welcomeEmailTemplate.Body = welcomeEmailTemplate.Body.Replace("{url}", _defaultConfig.ApplicationUrl);
+
+            var message = new Message(new string[] { userEmail }, welcomeEmailTemplate.Subject, welcomeEmailTemplate.Body);
+            await _emailSender.SendEmailAsync(message);
+        }
+    }
+    #endregion
 }

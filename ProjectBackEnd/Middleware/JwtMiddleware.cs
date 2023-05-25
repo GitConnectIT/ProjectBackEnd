@@ -21,12 +21,12 @@ public class JwtMiddleware
             !string.IsNullOrWhiteSpace(validateTokenResult.Item2) &&
             !string.IsNullOrWhiteSpace(validateTokenResult.Item3))
         {
-            var currentUser = await serviceManager.UserService.GetRecordById(validateTokenResult.Item1.Value);
+            //var currentUser = await serviceManager.UserService.GetRecordById(validateTokenResult.Item1.Value);
 
-            if (currentUser.TokenHash != validateTokenResult.Item3)
-                context.Items["User"] = null;
-            else
-                context.Items["User"] = context.User;
+            //if (currentUser.TokenHash != validateTokenResult.Item3)
+            //    context.Items["User"] = null;
+            //else
+            //    context.Items["User"] = context.User;
         }
         await _next(context);
     }

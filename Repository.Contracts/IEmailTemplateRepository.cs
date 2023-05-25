@@ -1,4 +1,6 @@
 ﻿using Entities.Models;
+using Shared.DTO;
+using Shared.RequestFeatures;
 
 namespace Repository.Contracts;
 

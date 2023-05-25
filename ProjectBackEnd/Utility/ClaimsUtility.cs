@@ -20,12 +20,10 @@ public static class ClaimsUtility
     public static int ReadCurrentUserRole2(IEnumerable<Claim> claims)
     {
         string role = claims.First(claims => claims.Type == ClaimTypes.Role).Value;
-        if (role == UserRole.Manager)
+        if (role == UserRole.Admin)
             return 1;
-        else if (role == UserRole.Recepsionist)
+        else 
             return 2;
-        else
-            return 3;
     }
 
 

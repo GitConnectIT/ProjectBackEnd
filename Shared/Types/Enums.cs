@@ -20,17 +20,3 @@ public enum LookupSortingDirection
     Desc
 }
 
-public enum AgentBalanceStatusEnum
-{
-    Pending,
-    Confirmed,
-    Declined
-}
-
-public enum ReservationStatusEnum
-{
-    Pending,
-    Succeded,
-    Postponed,
-    Canceled,
-}

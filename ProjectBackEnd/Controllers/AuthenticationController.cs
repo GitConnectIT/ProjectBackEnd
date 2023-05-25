@@ -1,5 +1,6 @@
 ﻿
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectBackEnd.Validation;
 using Service.Contracts;
@@ -21,6 +22,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Authorize(Roles = UserRole.Admin)]
     public async Task<IActionResult> Register([FromBody] UserRegisterDTO userRegister)
     {
         UserRegisterDTOValidator validator = new UserRegisterDTOValidator();
@@ -38,7 +40,7 @@ public class AuthenticationController : ControllerBase
         }
         else
         {
-            var result = await _service.AuthenticationService.CreateUserAsync(userRegister, UserRole.Recepsionist);
+            var result = await _service.AuthenticationService.CreateUserAsync(userRegister, UserRole.User);
 
             if (!result.Succeeded)
             {
@@ -110,20 +112,18 @@ public class AuthenticationController : ControllerBase
         };
         return Ok(baseResponse);
     }
-
-
-    //[HttpPut("two-factor-verification")]
-    //public async Task<IActionResult> TwoFactorVerification([FromBody] TwoStepDTO twoStepCode)
-    //{
-    //    var result = await _service.AuthenticationService.TwoStepVerification(twoStepCode);
-    //    var baseResponse = new BaseResponse<TokenDTO, object>
-    //    {
-    //        Result = true,
-    //        Data = result,
-    //        Errors = "",
-    //        StatusCode = StatusCodes.Status200OK
-    //    };
-    //    return Ok(baseResponse);
-    //}
+    [HttpPut("confirmation-email")]
+    public async Task<IActionResult> ConfirmationEmail([FromBody] ConfirmationEmailDTO confirmationEmail)
+    {
+        var result = await _service.AuthenticationService.ConfirmEmail(confirmationEmail);
+        var baseResponse = new BaseResponse<object, object>
+        {
+            Result = true,
+            Data = result,
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+    }
 
 }

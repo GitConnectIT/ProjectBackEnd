@@ -16,10 +16,5 @@ public class ApplicationUser : IdentityUser<int>
     public DateTime RefreshTokenExpiryTime { get; set; }
     public string? TokenHash { get; set; }
     public DateTime? DateCreated { get; set; }
-    //public ApplicationUser? Manager { get; set; }
-    public List<ApplicationUser>? Workers { get; set; }
-    public List<ServiceStaff>? ServiceStaff { get; set; }
-    public List<WorkingHourService>? WorkHours { get; set; }
-    public List<Delay>? Delays { get; set; }
 
 }

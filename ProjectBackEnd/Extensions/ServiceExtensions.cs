@@ -61,6 +61,7 @@ public static class ServiceExtensions
             o.Lockout.AllowedForNewUsers = true;
             o.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
             o.Lockout.MaxFailedAccessAttempts = 3;
+            o.Tokens.EmailConfirmationTokenProvider = TokenOptions.DefaultEmailProvider;
             //o.Tokens.ProviderMap.Add("default", new TokenProviderDescriptor(typeof(IUserTwoFactorTokenProvider<ApplicationUser>)));
 
         }).AddEntityFrameworkStores<RepositoryContext>().AddDefaultTokenProviders();
@@ -73,9 +74,9 @@ public static class ServiceExtensions
         {
             s.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "eRadha API",
+                Title = "ConnectIT_AlbaTrip API",
                 Version = "v1",
-                Description = "PROJECTBACKEND API by SerxhioBekteshi"
+                Description = "PROJECTBACKEND API by JolaSpahiu"
             });
 
             s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

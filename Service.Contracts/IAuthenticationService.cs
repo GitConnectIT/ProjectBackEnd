@@ -9,4 +9,6 @@ public interface IAuthenticationService
     Task<TokenDTO> ValidateUserAndCreateToken(UserLoginDTO userLogin);
     Task<TokenDTO> RefreshToken(TokenDTO tokenDto);
     Task<TokenDTO> TwoStepVerification(TwoStepDTO twoFactorDto);
+    Task<bool> ConfirmEmail(ConfirmationEmailDTO confirmationEmailDto);
+
 }

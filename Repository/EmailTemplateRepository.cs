@@ -18,4 +18,5 @@ public class EmailTemplateRepository : RepositoryBase<EmailTemplate>, IEmailTemp
         await FindByCondition(c => c.Id.Equals(id))
           .SingleOrDefaultAsync();
     public void UpdateRecord(EmailTemplate emailTemplate) => Update(emailTemplate);
+
 }
