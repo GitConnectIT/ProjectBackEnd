@@ -139,12 +139,31 @@ public class DapperRepository : IDapperRepository
 
     }
 
+    public async Task<bool> DeleteClient(int[] clientIds)
+    {
+        var query = @" DELETE FROM Clients
+                        where Id in @ClientIds";
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QuerySingleOrDefaultAsync<bool>(query, new { ClientIds = clientIds });
+            return result;
+        }
+    }
+    public async Task<bool> DeleteUser(int[] userIds)
+    {
+        var query = @" DELETE FROM AspNetUsers
+                        where Id in @UserIds";
+        using (var connection = _context.CreateConnection())
+        {
+            var result = await connection.QuerySingleOrDefaultAsync<bool>(query, new { UserIds = userIds });
+            return result;
+        }
+    }
 
-    
     public async Task<bool> DeleteEmailTemplate(int[] emailTemplateIds)
     {
         var query = @" DELETE FROM EmailTemplate
-                        where id in @EmailTemplateIds";
+                        where Id in @EmailTemplateIds";
         using (var connection = _context.CreateConnection())
         {
             var result = await connection.QuerySingleOrDefaultAsync<bool>(query, new { emailTemplateIds });

@@ -74,6 +74,57 @@ public class ClientService : IClientService
             throw new BadRequestException(ex.Message);
         }
     }
+    public async Task<bool> CreateRecord(ClientListDTO createClientDto)
+    {
+        try
+        {
+            var client = _mapper.Map<Clients>(createClientDto);
+
+            _repositoryManager.ClientRepository.CreateRecord(client);
+            await _repositoryManager.SaveAsync();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(CreateRecord), ex.Message));
+            throw new BadRequestException(ex.Message);
+        }
+    }
+
+    public async Task<bool> DeleteRecord(int[] clientIds)
+    {
+        try
+        {
+            await _dapperRepository.DeleteClient(clientIds);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(DeleteRecord), ex.Message));
+            throw new BadRequestException(ex.Message);
+        }
+    }
+
+    public async Task<bool> UpdateRecord(int id, ClientListDTO clientDto)
+    {
+        try
+        {
+            var exisitingClient = await GetClientAndCheckIfExistsAsync(id);
+
+            _mapper.Map(clientDto, exisitingClient);
+
+            _repositoryManager.ClientRepository.UpdateRecord(exisitingClient);
+            await _repositoryManager.SaveAsync();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(string.Format("{0}: {1}", nameof(UpdateRecord), ex.Message));
+            throw new BadRequestException(ex.Message);
+        }
+    }
     public async Task<bool> SendClientEmail(SendEmailDTO sendEmailDto)
     {
         try
@@ -83,6 +134,26 @@ public class ClientService : IClientService
                 var existingClient = await _repositoryManager.ClientRepository.GetRecordByIdAsync(clientId);
                 if (existingClient is not null)
                 {
+                    //var emailMessage = new MimeMessage();
+
+                    //var bodyBuilder = new BodyBuilder();
+                    //bodyBuilder.TextBody = sendEmailDto.Body;
+                    //if(sendEmailDto.Attachments !=null && sendEmailDto.Attachments.Any())
+                    //{
+                    //    byte[] fileeBytes;
+                    //    foreach(var attachment in sendEmailDto.Attachments)
+                    //    {
+                    //        using(var ms =new MemoryStream())
+                    //        {
+                    //            attachment.CopyTo(ms);
+                    //            fileeBytes = ms.ToArray();
+                    //        }
+                    //        bodyBuilder.Attachments.Add(attachment.FileName, fileeBytes, ContentType.Parse(attachment.ContentType));
+                    //    }
+                        
+                    //}
+                    //emailMessage.Body = bodyBuilder.ToMessageBody();
+
                     var message = new Message(new string[] { existingClient.Email }, sendEmailDto.Subject, sendEmailDto.Body);
                     await _emailSender.SendEmailAsync(message);
                 }

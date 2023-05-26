@@ -14,6 +14,10 @@ public interface IDapperRepository
 
 
     Task<bool> DeleteEmailTemplate(int[] emailTemplateIds);
+    Task<bool> DeleteClient(int[] clientIds);
+    Task<bool> DeleteUser(int[] userIds);
+
+
 
     //TABLE PAGGINATION
 

@@ -6,4 +6,5 @@ public interface IServiceManager
     IEmailTemplateService EmailTemplateService { get; }
     IAuthenticationService AuthenticationService { get; }
     IClientService ClientService { get; }
+    IUserService UserService { get; }
 }

@@ -18,6 +18,7 @@ public class ServiceManager : IServiceManager
     private readonly Lazy<IAuthenticationService> _authenticationService;
     private readonly Lazy<IEmailTemplateService> _emailTemplateService;
     private readonly Lazy<IClientService> _clientService;
+    private readonly Lazy<IUserService> _userService;
     private readonly IEmailSender _emailSender;
 
     public ServiceManager(IRepositoryManager repositoryManager
@@ -37,12 +38,13 @@ public class ServiceManager : IServiceManager
         _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, configuration, repositoryManager, signInManager, emailSender, cryptoUtils, defaultConfig));
         _emailTemplateService = new Lazy<IEmailTemplateService>(() => new EmailTemplateService(logger, mapper, repositoryManager, dapperRepository));
         _clientService = new Lazy<IClientService>(() => new ClientService(logger, mapper, repositoryManager, dapperRepository, emailSender));
+        _userService = new Lazy<IUserService>(() => new UserService(logger, mapper, repositoryManager, dapperRepository, emailSender));
 
     }
 
     public IApplicationMenuService ApplicationMenuService => _applicationMenuService.Value;
     public IAuthenticationService AuthenticationService => _authenticationService.Value;
     public IEmailTemplateService EmailTemplateService => _emailTemplateService.Value;
-    public IClientService ClientService => _clientService.Value;    
-
+    public IClientService ClientService => _clientService.Value;
+    public IUserService UserService => _userService.Value;
 }

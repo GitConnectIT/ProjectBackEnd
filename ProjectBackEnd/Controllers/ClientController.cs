@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProjectBackEnd.Authorization;
 using ProjectBackEnd.Utility;
+using ProjectBackEnd.Validation;
 using Service.Contracts;
 using Shared.DTO;
 using Shared.RequestFeatures;
@@ -44,6 +45,51 @@ public class ClientController : ControllerBase
         {
             Result = true,
             Data = result,
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+    }
+    [HttpPost()]
+    public async Task<IActionResult> CreateClient([FromBody] ClientListDTO createClient)
+    {
+        var result = await _service.ClientService.CreateRecord(createClient);
+
+        var baseResponse = new BaseResponse<object, object>
+        {
+            Result = result,
+            Data = "",
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateEmailTemplate(int id, [FromBody] ClientListDTO updateClient)
+    {
+        var result = await _service.ClientService.UpdateRecord(id, updateClient);
+
+        var baseResponse = new BaseResponse<object, object>
+        {
+            Result = result,
+            Data = "",
+            Errors = "",
+            StatusCode = StatusCodes.Status200OK
+        };
+        return Ok(baseResponse);
+
+    }
+
+    [HttpPost("delete")]
+    public async Task<IActionResult> DeleteClient(int[] clientIds)
+    {
+        var result = await _service.ClientService.DeleteRecord(clientIds);
+        var baseResponse = new BaseResponse<object, object>
+        {
+            Result = result,
+            Data = "",
             Errors = "",
             StatusCode = StatusCodes.Status200OK
         };
